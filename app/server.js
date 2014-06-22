@@ -5,6 +5,9 @@ var databaseUrl = 'mongodb://dev:angular@ds047107.mongolab.com:47107/getitrightd
 var collections = ['active_users'];
 var db = require('mongojs').connect(databaseUrl, collections);
 
+app.use(express.static('public'));
+app.use(express.json());
+
 //Getting Data
 app.get('/api/active-users', function(req, res) {
   var now = new Date().valueOf(),
@@ -18,21 +21,21 @@ app.get('/api/active-users', function(req, res) {
 });
 
 //Storing DATA
-app.get('/api/heartbeat', function(req, res) {
+app.post('/api/heartbeat', function(req, res) {
   var data = {
-      id: req.query.id,
+      id: req.body.id,
       coords: {
         long: req.query.long,
         lat: req.query.lat
       },
       last_updated: new Date()
     };
-
+console.log(data.id);
   if (data.id) {
     db.active_users.update({id: data.id}, data, callback);
   } else {
     data.id = uid();
-    db.active_users.save(data, callback); 
+    db.active_users.save(data, callback);
   }
 
   function callback(err, saved) {
